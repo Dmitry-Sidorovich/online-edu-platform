@@ -1,0 +1,31 @@
+{
+  "compileOnSave": true,
+  "compilerOptions": {
+    "module": "commonjs",
+    "outDir": "dist",
+    "allowJs": true,
+    "target": "es6",
+    "esModuleInterop": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "allowUnreachableCode": false,
+    "noImplicitReturns": true,
+    "noImplicitAny": true,
+    "typeRoots": [
+      "node_modules/@types"
+    ],
+    "types": ["node"],
+    "lib": [
+      "es2021",
+      "ESNext.String",
+      "dom"
+    ],
+    "sourceMap": true,
+    "alwaysStrict": true,
+    "forceConsistentCasingInFileNames": true
+  },
+  "include": [
+    "*/**/*.*", "custom.d.ts"
+  ],
+  "exclude": ["node_modules"]
+}
