@@ -1,0 +1,13 @@
+node_modules
+.idea/*
+src/**/*.map
+dist
+images/*
+!images/.gitkeep
+npm-debug.log
+newrelic_agent.log
+coverage
+k8s/tmp/*.*
+.env
+*.decrypted.*
+hs_err*
