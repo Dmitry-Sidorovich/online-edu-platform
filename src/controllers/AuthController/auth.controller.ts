@@ -1,74 +1,67 @@
 import * as express from 'express';
-import {NextFunction, Request, Response} from 'express';
-import { generateToken } from '../../utils/jwt.utils';
-import {UserService} from "../../services/userService/user.service";
-import {authMiddleware} from "../../middleware/authMiddleware";
+import { Response } from 'express';
+import { AuthService } from '../../services/authService/auth.service';
+import { loginSchema, registrationSchema } from './auth.controller.schemas';
+import { expressJoiMiddleware } from '../../middlewares/ExpressJoiMiddleware/express-joi.middleware';
+import { authMiddleware } from '../../middlewares/authMiddleware';
+import {
+  DeleteUserRequest,
+  LoginRequest,
+  RegistrationRequest,
+} from './auth.controller.interface';
+import { roleMiddleware } from '../../middlewares/roleMiddleware';
 
 const router = express.Router();
-const userService = new UserService();
+const authService: AuthService = new AuthService();
 
-// Middleware для валидации запроса на регистрацию
-export const registrationValidationMiddleware = (req: Request, res: Response, next: NextFunction): void => {
-    const { username, email, password } = req.body;
-    if (!username || !email || !password) {
-        res.status(400).json({ message: 'All fields are required (username, email, password)' });
-        return; // Добавлен return для завершения функции
-    }
-    next();
-};
-
-// Middleware для валидации запроса на аутентификацию
-export const loginValidationMiddleware = (req: Request, res: Response, next: NextFunction): void => {
-    const { email, password } = req.body;
-    if (!email || !password) {
-        res.status(400).json({ message: 'Both email and password are required' });
-        return; // Добавлен return для завершения функции
-    }
-    next();
-};
-
-router.post('/register', registrationValidationMiddleware, async (req: Request, res: Response): Promise<void> => {
-    const { username, email, password } = req.body;
+router.post(
+  '/register',
+  expressJoiMiddleware.body(registrationSchema),
+  async (req: RegistrationRequest, res: Response) => {
+    const { username, email, password, role } = req.body;
     try {
-        const user = await userService.registerUser(username, email, password);
-        res.status(201).json(user);
+      const user = await authService.register({
+        username,
+        email,
+        password,
+        role,
+      });
+      res.status(201).json(user);
     } catch (error) {
-        res.status(500).json({ error: error.message });
+      res.status(500).json(error);
     }
-});
+  },
+);
 
-router.post('/login', loginValidationMiddleware, async (req: Request, res: Response): Promise<void> => {
+router.post(
+  '/login',
+  expressJoiMiddleware.body(loginSchema),
+  async (req: LoginRequest, res: Response) => {
     const { email, password } = req.body;
     try {
-        const user = await userService.authenticateUser(email, password);
-        if (!user) {
-            res.status(401).json({ message: 'Authentication failed' });
-            return; // Обеспечивает выход из функции
-        }
-        const token = generateToken(user);
-        res.status(200).json({ message: 'Authenticated successfully', token });
+      const token = await authService.login({ email, password });
+      if (!token) res.status(401).json({ message: 'Authentication failed' });
+      else res.status(200).json({ token });
     } catch (error) {
-        res.status(500).json({ error: error.message });
+      res.status(500).json(error);
     }
-});
+  },
+);
 
-router.get('/protected-route', authMiddleware, (req: Request, res: Response) => {
-    // Теперь этот маршрут доступен только аутентифицированным пользователям
-    res.json({ message: 'Это защищенный маршрут, и вы аутентифицированы!' });
-});
-
-router.delete('/user/:id', async (req: Request, res: Response): Promise<void> => {
+router.delete(
+  '/user/:id',
+  authMiddleware,
+  roleMiddleware(['admin', 'teacher']),
+  async (req: DeleteUserRequest, res: Response) => {
     const userId = parseInt(req.params.id);
     try {
-        const isDeleted = await userService.deleteUser(userId);
-        if (!isDeleted) {
-            res.status(404).json({ message: 'User not found' });
-            return; // Обеспечивает выход из функции
-        }
-        res.status(200).json({ message: 'User deleted successfully' });
+      const isDeleted = await authService.deleteUser(userId);
+      if (!isDeleted) res.status(404).json({ message: 'User not found' });
+      else res.status(200).json({ message: 'User deleted successfully' });
     } catch (error) {
-        res.status(500).json({ error: error.message });
+      res.status(500).json(error);
     }
-});
+  },
+);
 
 export { router as authRouter };

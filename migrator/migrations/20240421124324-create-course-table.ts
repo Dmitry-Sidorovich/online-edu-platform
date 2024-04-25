@@ -1,23 +1,30 @@
 import { QueryInterface, DataTypes } from 'sequelize';
 
-const USERS_TABLE_NAME: string = 'users';
+const COURSES_TABLE_NAME: string = 'courses';
 
 export const up = async (queryInterface: QueryInterface): Promise<void> => {
-    await queryInterface.createTable(USERS_TABLE_NAME, {
+    await queryInterface.createTable(COURSES_TABLE_NAME, {
         id: {
             allowNull: false,
             autoIncrement: true,
             primaryKey: true,
             type: DataTypes.INTEGER.UNSIGNED
         },
-        email: {
+        title: {
             allowNull: false,
-            unique: true,
             type: DataTypes.STRING
         },
-        password: {
+        description: {
+            allowNull: true,
+            type: DataTypes.TEXT
+        },
+        teacherId: {
             allowNull: false,
-            type: DataTypes.STRING
+            type: DataTypes.INTEGER.UNSIGNED,
+            references: {
+                model: 'users',
+                key: 'id'
+            }
         },
         createdAt: {
             allowNull: false,
@@ -33,9 +40,8 @@ export const up = async (queryInterface: QueryInterface): Promise<void> => {
 };
 
 export const down = async (queryInterface: QueryInterface): Promise<void> => {
-    await queryInterface.dropTable(USERS_TABLE_NAME);
+    await queryInterface.dropTable(COURSES_TABLE_NAME);
 };
-
 
 module.exports = {
     up,

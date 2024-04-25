@@ -5,6 +5,7 @@
     "outDir": "dist",
     "allowJs": true,
     "target": "es6",
+    "strictPropertyInitialization": false,
     "esModuleInterop": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,

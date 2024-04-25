@@ -1,11 +1,18 @@
-import helmet from "helmet";
-
+import helmet from 'helmet';
 require('dotenv').config();
-import { Express, Request, Response, NextFunction } from 'express';
-const express = require('express');
+import { Express, Request, Response } from 'express';
+import express from 'express';
 import { authRouter } from './controllers/AuthController/auth.controller';
-import {initializeDb} from "./services/dbService/db.service";
+import { initializeDb } from './services/dbService/db.service';
 import morgan from 'morgan';
+import { coursesRouter } from './controllers/CoursesController/courses.controller';
+import { lessonsRouter } from './controllers/LessonsController/lessons.controller';
+import { assignmentsRouter } from './controllers/AssignmentsController/assignments.controller';
+import { submissionsRouter } from './controllers/SubmissionsController/submissions.controller';
+import { authMiddleware } from './middlewares/authMiddleware';
+import errorHandler from './middlewares/errorHandler';
+import { enrollmentsRouter } from './controllers/EnrollmentsController/enrollments.controller';
+import { githubAuthRouter } from './controllers/GitHubAuthController/githubAuth.controller';
 //import csurf from 'csurf';
 
 initializeDb();
@@ -19,18 +26,25 @@ app.use(helmet());
 // Middleware для разбора JSON-форматированных тел запросов
 app.use(express.json());
 
-// Регистрация маршрутов для аутентификации
 app.use('/api/auth', authRouter);
+app.use('/auth', githubAuthRouter);
 
-// Обработчик ошибок 404 - Ресурс не найден
+app.use('/api', authMiddleware);
+// Регистрация маршрутов для аутентификации
+app.use('/api/courses', coursesRouter);
+app.use('/api/lessons', lessonsRouter);
+app.use('/api/assignments', assignmentsRouter);
+app.use('/api/submissions', submissionsRouter);
+app.use('/api/enrollments', enrollmentsRouter);
+
+app.use(errorHandler);
+
 app.use((req: Request, res: Response) => {
-    res.status(404).json({ message: 'Resource not found' });
+  res.status(404).json({ message: 'Resource not found' });
 });
-
-// Глобальный обработчик ошибок
-app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
-    console.error(err);  // Логгирование ошибки для разработчика
-    res.status(500).json({ message: 'Internal server error' });
+app.use((err: Error, req: Request, res: Response) => {
+  console.error(err);
+  res.status(500).json({ message: 'Internal server error' });
 });
 
 export default app;
