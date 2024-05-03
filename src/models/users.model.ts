@@ -53,5 +53,21 @@ export class Users extends Model<Users> {
 
   @AllowNull(true)
   @Column(DataType.STRING(128))
-  githubId?: string;
+  githubId?: string | null;
+
+  @AllowNull(true)
+  @Column(DataType.STRING(255))
+  salt: string | null;
+
+  @AllowNull(true)
+  @Column(DataType.TEXT)
+  verifier: string | null;
+
+  @AllowNull(true)
+  @Column(DataType.TEXT)
+  serverPublicKey: string | null;
+
+  @AllowNull(true)
+  @Column(DataType.TEXT)
+  serverSecret: string | null;
 }
