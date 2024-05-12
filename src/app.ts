@@ -13,7 +13,7 @@ import { authMiddleware } from './middlewares/authMiddleware';
 import errorHandler from './middlewares/errorHandler';
 import { enrollmentsRouter } from './controllers/EnrollmentsController/enrollments.controller';
 import { githubAuthRouter } from './controllers/GitHubAuthController/githubAuth.controller';
-import { srpAuthRouter } from './controllers/SrpAuthController/srpAuth.controller';
+import { zkpAuthRouter } from './controllers/ZkpAuthController/zkpAuth.controller';
 //import csurf from 'csurf';
 
 initializeDb();
@@ -37,7 +37,8 @@ app.use('/api/lessons', lessonsRouter);
 app.use('/api/assignments', assignmentsRouter);
 app.use('/api/submissions', submissionsRouter);
 app.use('/api/enrollments', enrollmentsRouter);
-app.use('/srp-auth', srpAuthRouter);
+
+app.use('/zkp-auth', zkpAuthRouter);
 
 app.use(errorHandler);
 

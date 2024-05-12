@@ -56,18 +56,14 @@ export class Users extends Model<Users> {
   githubId?: string | null;
 
   @AllowNull(true)
-  @Column(DataType.STRING(255))
-  salt: string | null;
+  @Column(DataType.TEXT)
+  proof: string | null; // Для хранения результатов верификации
 
   @AllowNull(true)
   @Column(DataType.TEXT)
-  verifier: string | null;
+  publicSignals: string | null; // Для хранения публичных сигналов
 
   @AllowNull(true)
   @Column(DataType.TEXT)
-  serverPublicKey: string | null;
-
-  @AllowNull(true)
-  @Column(DataType.TEXT)
-  serverSecret: string | null;
+  zkpVerificationKey: string | null; // Ключ верификации для ZKP
 }
