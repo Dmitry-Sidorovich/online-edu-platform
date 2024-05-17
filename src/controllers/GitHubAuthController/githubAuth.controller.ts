@@ -27,8 +27,7 @@ router.get('/github/callback', async (req: Request, res: Response) => {
       email: userInfo.email,
     });
 
-    // Логирование успешной интеграции
-    console.log('User integrated successfully:', user);
+    console.log('User integrated successfully:', user.email);
     res.json({
       message: 'Authentication successful',
       user,

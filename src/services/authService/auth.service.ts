@@ -3,7 +3,6 @@ import jwt from 'jsonwebtoken';
 import { AuthRepository } from './DAL/auth.repository';
 import { Users } from '../../models/users.model';
 import { UserLoginData, UserRegistrationData } from './auth.service.interface';
-import axios from 'axios';
 
 export class AuthService {
   private authRepository: AuthRepository;
@@ -69,7 +68,7 @@ export class AuthService {
       email: userData.email,
       username: userData.login,
     });
-    console.log('Integrated user:', user);
+    console.log(`Integrated user with email: ${user.email}`);
     return user;
   }
 }

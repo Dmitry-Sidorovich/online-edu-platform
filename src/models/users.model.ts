@@ -57,13 +57,17 @@ export class Users extends Model<Users> {
 
   @AllowNull(true)
   @Column(DataType.TEXT)
+  salt: string | null; // Соль для пароля
+
+  @AllowNull(true)
+  @Column(DataType.TEXT)
+  passwordHashPart1: string | null; // Часть 1 хеша пароля
+
+  @AllowNull(true)
+  @Column(DataType.TEXT)
+  passwordHashPart2: string | null; // Часть 2 хеша пароля
+
+  @AllowNull(true)
+  @Column(DataType.TEXT)
   proof: string | null; // Для хранения результатов верификации
-
-  @AllowNull(true)
-  @Column(DataType.TEXT)
-  publicSignals: string | null; // Для хранения публичных сигналов
-
-  @AllowNull(true)
-  @Column(DataType.TEXT)
-  zkpVerificationKey: string | null; // Ключ верификации для ZKP
 }

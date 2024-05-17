@@ -1,11 +1,7 @@
 import { Users } from '../../../models/users.model';
 
 export class ZkpAuthRepository {
-  async create(data: {
-    username: string;
-    proof: string;
-    publicSignals: string;
-  }) {
+  async create(data: any) {
     return await Users.create(data);
   }
 

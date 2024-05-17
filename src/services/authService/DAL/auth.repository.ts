@@ -21,13 +21,22 @@ export class AuthRepository {
     email: string;
     username: string;
   }): Promise<Users> {
-    const [user, created] = await Users.findOrCreate({
-      where: { githubId: userData.githubId },
-      defaults: {
+    const user = await Users.findOne({ where: { email: userData.email } });
+
+    if (user) {
+      // Обновление существующего пользователя
+      await user.update({
+        githubId: userData.githubId,
+        username: userData.username,
+      });
+      return user;
+    } else {
+      // Создание нового пользователя
+      return await Users.create({
+        githubId: userData.githubId,
         email: userData.email,
         username: userData.username,
-      },
-    });
-    return user;
+      });
+    }
   }
 }
