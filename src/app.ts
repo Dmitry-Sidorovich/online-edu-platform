@@ -31,6 +31,8 @@ app.use('/api/auth', authRouter);
 app.use('/api/github-auth', githubAuthRouter);
 app.use('/api/zkp-auth', zkpAuthRouter);
 
+console.log('test pr!');
+
 app.use('/api', authMiddleware);
 
 app.use('/api/courses', coursesRouter);
