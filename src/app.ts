@@ -28,19 +28,16 @@ app.use(helmet());
 app.use(express.json());
 
 app.use('/api/auth', authRouter);
-app.use('/auth', githubAuthRouter);
+app.use('/api/github-auth', githubAuthRouter);
+app.use('/api/zkp-auth', zkpAuthRouter);
 
 app.use('/api', authMiddleware);
-// Регистрация маршрутов для аутентификации
+
 app.use('/api/courses', coursesRouter);
 app.use('/api/lessons', lessonsRouter);
 app.use('/api/assignments', assignmentsRouter);
 app.use('/api/submissions', submissionsRouter);
 app.use('/api/enrollments', enrollmentsRouter);
-
-app.use('/zkp-auth', zkpAuthRouter);
-
-app.use(errorHandler);
 
 app.use((req: Request, res: Response) => {
   res.status(404).json({ message: 'Resource not found' });
@@ -49,5 +46,7 @@ app.use((err: Error, req: Request, res: Response) => {
   console.error(err);
   res.status(500).json({ message: 'Internal server error' });
 });
+
+app.use(errorHandler);
 
 export default app;

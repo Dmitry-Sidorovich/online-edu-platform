@@ -1,0 +1,5 @@
+def main(private field part1, private field part2, field[2] expectedHash) -> field {
+    assert(part1 == expectedHash[0]);
+    assert(part2 == expectedHash[1]);
+    return 1;
+}

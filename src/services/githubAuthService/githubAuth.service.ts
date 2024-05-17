@@ -3,7 +3,7 @@ import axios from 'axios';
 export class GithubAuthService {
   private clientId = process.env.GITHUB_CLIENT_ID;
   private clientSecret = process.env.GITHUB_CLIENT_SECRET;
-  private redirectUri = 'http://localhost:3001/auth/github/callback';
+  private redirectUri = 'http://localhost:3001/api/github-auth/github/callback';
 
   public createGithubAuthUrl(): string {
     const base = 'https://github.com/login/oauth/authorize';
@@ -36,7 +36,6 @@ export class GithubAuthService {
       const response = await axios.get('https://api.github.com/user', {
         headers: { Authorization: `Bearer ${token}` },
       });
-      console.log('User data:', response.data);
       return response.data; // Возвращает данные пользователя GitHub
     } catch (error) {
       console.error('Error fetching user data:', error.response.data);
