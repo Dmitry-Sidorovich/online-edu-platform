@@ -18,15 +18,14 @@ router.post(
   '/register',
   expressJoiMiddleware.body(registrationSchema),
   async (req: RegistrationRequest, res: Response) => {
-    const { username, email, password, role } = req.body;
+    const { username, email, password } = req.body;
     try {
-      const user = await authService.register({
+      const { user, token } = await authService.register({
         username,
         email,
         password,
-        role,
       });
-      res.status(201).json(user);
+      res.status(201).json({ user, token });
     } catch (error) {
       res.status(500).json(error);
     }

@@ -30,6 +30,7 @@ router.get('/github/callback', async (req: Request, res: Response) => {
     console.log('User integrated successfully:', user.email);
     res.json({
       message: 'Authentication successful',
+      token,
       user,
     });
   } catch (error) {
