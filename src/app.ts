@@ -21,7 +21,12 @@ initializeDb();
 
 const app: Express = express();
 
-app.use(cors());
+const corsOptions = {
+  origin: 'http://localhost:4200',
+  optionsSuccessStatus: 200,
+};
+
+app.use(cors(corsOptions));
 app.use(morgan('tiny'));
 app.use(helmet());
 //app.use(csurf({ cookie: true })); // Используйте настройки в соответствии с вашими требованиями
