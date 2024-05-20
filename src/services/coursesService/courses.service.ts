@@ -26,4 +26,9 @@ export class CoursesService {
   public async deleteCourse(id: number): Promise<number> {
     return this.courseRepository.deleteCourse(id);
   }
+
+  public async getAllCourses(): Promise<Courses[]> {
+    // Предполагается, что здесь используется ORM или прямой запрос к базе данных
+    return await Courses.findAll();
+  }
 }

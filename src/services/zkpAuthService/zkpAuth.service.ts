@@ -46,18 +46,7 @@ export class ZkpAuthService {
       proof: JSON.stringify(proof),
     });
 
-    // Генерация JWT токена
-    if (!process.env.JWT_SECRET) {
-      throw new Error('JWT_SECRET is not defined in .env file');
-    }
-    const jwtSecret = process.env.JWT_SECRET;
-
-    const token = jwt.sign(
-      { id: user.id, email, username, role: user.role },
-      jwtSecret,
-      { expiresIn: '1h' },
-    );
-
+    const token = this.generateToken(user.id, username, email, user.role);
     return { token };
   }
 
@@ -83,20 +72,30 @@ export class ZkpAuthService {
 
     const isValid = await verifyProof();
     if (isValid) {
-      const token = this.generateToken(username, email);
+      const token = this.generateToken(
+        userData.id,
+        username,
+        email,
+        userData.role,
+      );
       return { isValid, token };
     } else {
       return { isValid };
     }
   }
 
-  private generateToken(username: string, email: string): string {
+  private generateToken(
+    id: number,
+    username: string,
+    email: string,
+    role: string,
+  ): string {
     if (!process.env.JWT_SECRET) {
       throw new Error('JWT_SECRET is not defined in .env file');
     }
     const jwtSecret = process.env.JWT_SECRET;
 
-    const token: string = jwt.sign({ username, email }, jwtSecret, {
+    const token: string = jwt.sign({ id, username, email, role }, jwtSecret, {
       expiresIn: '1h',
     });
     return token;

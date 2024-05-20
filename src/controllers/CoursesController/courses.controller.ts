@@ -83,4 +83,13 @@ router.delete(
   },
 );
 
+router.get('/', async (req: Request, res: Response): Promise<void> => {
+  try {
+    const courses = await courseService.getAllCourses();
+    res.status(200).json(courses);
+  } catch (error) {
+    res.status(500).send('Error fetching courses: ' + error.message);
+  }
+});
+
 export { router as coursesRouter };
