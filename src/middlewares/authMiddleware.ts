@@ -30,14 +30,12 @@ export const authMiddleware = async (
       role: string;
     };
 
-    // Дополнительно проверяем, существует ли пользователь
     const user = await Users.findByPk(decoded.id);
     if (!user) {
       res.status(401).json({ message: 'Invalid token.' });
       return;
     }
 
-    // Проверяем, соответствует ли роль в токене роли в базе данных
     if (user.role !== decoded.role) {
       res.status(401).json({ message: 'Invalid token.' });
       return;

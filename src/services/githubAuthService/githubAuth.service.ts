@@ -1,4 +1,5 @@
 import axios from 'axios';
+import jwt from 'jsonwebtoken';
 
 export class GithubAuthService {
   private clientId = process.env.GITHUB_CLIENT_ID;
@@ -41,5 +42,19 @@ export class GithubAuthService {
       console.error('Error fetching user data:', error.response.data);
       throw error;
     }
+  }
+
+  public generateToken(user: any): string {
+    if (!process.env.JWT_SECRET) {
+      throw new Error('JWT_SECRET is not defined in .env file');
+    }
+    const jwtSecret = process.env.JWT_SECRET;
+
+    const token: string = jwt.sign(
+      { id: user.id, username: user.login, email: user.email, role: user.role },
+      jwtSecret,
+      { expiresIn: '1h' },
+    );
+    return token;
   }
 }
