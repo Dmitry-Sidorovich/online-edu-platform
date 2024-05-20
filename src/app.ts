@@ -15,11 +15,18 @@ import { enrollmentsRouter } from './controllers/EnrollmentsController/enrollmen
 import { githubAuthRouter } from './controllers/GitHubAuthController/githubAuth.controller';
 import { zkpAuthRouter } from './controllers/ZkpAuthController/zkpAuth.controller';
 //import csurf from 'csurf';
+import cors from 'cors';
 
 initializeDb();
 
 const app: Express = express();
 
+const corsOptions = {
+  origin: 'http://localhost:4200',
+  optionsSuccessStatus: 200,
+};
+
+app.use(cors(corsOptions));
 app.use(morgan('tiny'));
 app.use(helmet());
 //app.use(csurf({ cookie: true })); // Используйте настройки в соответствии с вашими требованиями

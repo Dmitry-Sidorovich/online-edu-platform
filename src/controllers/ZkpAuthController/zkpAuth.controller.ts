@@ -7,9 +7,11 @@ const zkpAuthService: ZkpAuthService = new ZkpAuthService();
 
 router.post('/register', async (req: Request, res: Response): Promise<void> => {
   try {
-    const { username, password } = req.body;
-    await zkpAuthService.register(username, password);
-    res.status(201).send('User successfully registered using ZKP.');
+    const { username, password, email } = req.body;
+    const { token } = await zkpAuthService.register(username, password, email);
+    res
+      .status(201)
+      .json({ message: 'User successfully registered using ZKP.', token });
   } catch (error) {
     res.status(500).send('Error during user registration: ' + error.message);
   }
@@ -18,12 +20,14 @@ router.post('/register', async (req: Request, res: Response): Promise<void> => {
 router.post('/login', async (req: Request, res: Response): Promise<void> => {
   try {
     const { username, password } = req.body;
-    const isValid: boolean = await zkpAuthService.authenticate(
+    const { isValid, token } = await zkpAuthService.authenticate(
       username,
       password,
     );
     if (isValid) {
-      res.status(200).send('User successfully authenticated using ZKP.');
+      res
+        .status(200)
+        .json({ message: 'User successfully authenticated using ZKP.', token });
     } else {
       res.status(401).send('Authentication error.');
     }

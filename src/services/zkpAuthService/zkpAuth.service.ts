@@ -12,11 +12,16 @@ import {
   hexToDecimal,
 } from '../../utils/zkpUtils';
 import { NotFoundError } from '../../utils/errors';
+import jwt from 'jsonwebtoken';
 
 export class ZkpAuthService {
   private zkpAuthRepository: ZkpAuthRepository = new ZkpAuthRepository();
 
-  async register(username: string, password: string): Promise<void> {
+  async register(
+    username: string,
+    password: string,
+    email: string,
+  ): Promise<{ token: string }> {
     await compileCircuit();
     await setupCircuit();
 
@@ -32,22 +37,40 @@ export class ZkpAuthService {
     );
     //const publicSignals = extractPublicSignals();
 
-    await this.zkpAuthRepository.create({
+    const user = await this.zkpAuthRepository.create({
       username,
+      email,
       passwordHashPart1: parts[0],
       passwordHashPart2: parts[1],
       salt,
       proof: JSON.stringify(proof),
     });
+
+    // Генерация JWT токена
+    if (!process.env.JWT_SECRET) {
+      throw new Error('JWT_SECRET is not defined in .env file');
+    }
+    const jwtSecret = process.env.JWT_SECRET;
+
+    const token = jwt.sign(
+      { id: user.id, email, username, role: user.role },
+      jwtSecret,
+      { expiresIn: '1h' },
+    );
+
+    return { token };
   }
 
-  async authenticate(username: string, password: string): Promise<boolean> {
+  async authenticate(
+    username: string,
+    password: string,
+  ): Promise<{ isValid: boolean; token?: string }> {
     const userData = await this.zkpAuthRepository.findByUsername(username);
     if (!userData) {
       throw new NotFoundError(`User with username ${username} not found.`);
     }
 
-    const { passwordHashPart1, passwordHashPart2, salt } = userData;
+    const { passwordHashPart1, passwordHashPart2, salt, email } = userData;
 
     const hashedPassword: string = await hashPassword(password + salt);
     const parts: string[] = splitHashToParts(hashedPassword, 32);
@@ -58,6 +81,24 @@ export class ZkpAuthService {
 
     await generateProof([...decimalParts, ...storedParts]);
 
-    return await verifyProof();
+    const isValid = await verifyProof();
+    if (isValid) {
+      const token = this.generateToken(username, email);
+      return { isValid, token };
+    } else {
+      return { isValid };
+    }
+  }
+
+  private generateToken(username: string, email: string): string {
+    if (!process.env.JWT_SECRET) {
+      throw new Error('JWT_SECRET is not defined in .env file');
+    }
+    const jwtSecret = process.env.JWT_SECRET;
+
+    const token: string = jwt.sign({ username, email }, jwtSecret, {
+      expiresIn: '1h',
+    });
+    return token;
   }
 }

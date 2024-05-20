@@ -2,6 +2,7 @@ import { Request, Response, Router } from 'express';
 import axios from 'axios';
 import { GithubAuthService } from '../../services/githubAuthService/githubAuth.service';
 import { AuthService } from '../../services/authService/auth.service';
+import crypto from 'crypto';
 
 const router = Router();
 const githubAuthService = new GithubAuthService();
@@ -28,10 +29,18 @@ router.get('/github/callback', async (req: Request, res: Response) => {
     });
 
     console.log('User integrated successfully:', user.email);
-    res.json({
-      message: 'Authentication successful',
-      user,
-    });
+    // res.json({
+    //   message: 'Authentication successful',
+    //   token,
+    //   user,
+    // });
+
+    //Передаем данные через URL-хеш
+    // const redirectUrl = `http://localhost:4200/login-jwt#token=${token}&user=${encodeURIComponent(JSON.stringify(user))}`;
+    // res.redirect(redirectUrl);
+    // Передаем данные через URL параметры
+    const redirectUrl = `http://localhost:4200/login-jwt?token=${token}&user=${encodeURIComponent(JSON.stringify(user))}`;
+    res.redirect(redirectUrl);
   } catch (error) {
     console.error('Error during GitHub authentication:', error);
     res.status(500).json({
@@ -40,5 +49,9 @@ router.get('/github/callback', async (req: Request, res: Response) => {
     });
   }
 });
+
+function generateNonce() {
+  return crypto.randomBytes(16).toString('base64');
+}
 
 export { router as githubAuthRouter };

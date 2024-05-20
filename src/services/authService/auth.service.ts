@@ -11,14 +11,19 @@ export class AuthService {
     this.authRepository = new AuthRepository();
   }
 
-  public async register(userData: UserRegistrationData): Promise<Users> {
+  public async register(
+    userData: UserRegistrationData,
+  ): Promise<{ user: Users; token: string }> {
     const hashedPassword = await bcrypt.hash(userData.password, 10);
-    return this.authRepository.createUser({
+    const user = await this.authRepository.createUser({
       username: userData.username,
       email: userData.email,
       password: hashedPassword,
-      role: userData.role,
     });
+
+    const token = this.generateToken(user);
+
+    return { user, token };
   }
 
   public async login(userData: UserLoginData): Promise<string | null> {
@@ -33,6 +38,11 @@ export class AuthService {
     );
     if (!isMatch) return null;
 
+    const token: string = this.generateToken(user);
+    return token;
+  }
+
+  private generateToken(user: Users): string {
     if (!process.env.JWT_SECRET) {
       throw new Error('JWT_SECRET is not defined in .env file');
     }
